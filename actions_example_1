@@ -1,0 +1,103 @@
+import axios from "axios";
+import { serverUrl } from "../../utils/helper";
+import { responseOK } from "../actions";
+
+//hardwares
+export const GET_ALL_HARDWARES = store => {
+  axios
+    .get(`${serverUrl}/public/base/hardware`, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (res.data && res.data.hardwareFolders) {
+        store.commit("GETHARDWARES", res.data.hardwareFolders);
+      }
+    });
+};
+
+//update single hardware
+export const UPDATE_HARDWARE = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/edit-group`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (responseOK(res)) {
+        store.commit("SET_HARDWARE", res.data);
+      }
+    });
+};
+
+export const CREATE_HARDWARE = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/add-group`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      // if (res.data.status) store.commit("SET_HARDWARE", res.data);
+      if (responseOK(res)) {
+        store.commit("CREATE_HARDWARE", res.data);
+      }
+    });
+};
+
+export const REMOVE_HARDWARE = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/remove-hardware-group`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (responseOK(res)) {
+        store.commit("REMOVE_HARDWARE", data);
+      }
+    });
+};
+
+export const UPDATE_HARDWARE_FOLDER = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/editHardwareFolder`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (responseOK(res)) store.commit("SET_HARDWARE_FOLDER", res.data);
+    });
+};
+
+export const REMOVE_HARDWARE_FOLDER = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/remove-hardware-folder`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (responseOK(res)) {
+        store.commit("REMOVE_HARDWARE_FOLDER", data);
+      }
+    });
+};
+
+export const CREATE_HARDWARE_FOLDER = (store, data) => {
+  axios
+    .post(`${serverUrl}/public/base/hardware/add-hardware-folder`, data, {
+      headers: {
+        "x-auth-token": store.state.userAuth.token
+      }
+    })
+    .then(res => {
+      if (res.status === 200 && res.data.status) {
+        store.commit("CREATE_HADRWARE_FOLDER", res.data.folder);
+      }
+      //store.commit("SET_HARDWARE_FOLDER", res.data);
+    });
+};
