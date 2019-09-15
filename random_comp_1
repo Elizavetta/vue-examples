@@ -1,0 +1,648 @@
+<template>
+  <div>
+    <div class="elements-panel-actions">
+      <div class="elements-panel-actions-item" v-on:click="createNewFolder()">
+        + Группа
+      </div>
+      <div class="elements-panel-actions-item" v-on:click="createNewItem()">
+        + Фурнитура
+      </div>
+    </div>
+    <!-- glasses -->
+    <div>
+      <div
+        class="elements-panel-folder"
+        v-for="(folder, ind) in hardwares"
+        :key="ind"
+      >
+        <h5 class="elements-panel-folder-title">
+          <span>{{ folder.name }}</span>
+          <span
+            class="elements-panel-folder-edit"
+            v-on:click="openItemFolder(folder)"
+            >&#x1F589;</span
+          >
+        </h5>
+
+        <div class="elements-panel-line-item" v-if="ind == 0">
+          <div class="elements-panel-line-item-column">Название</div>
+          <div class="elements-panel-line-item-column">Активна</div>
+          <div class="elements-panel-line-item-column">По умолчанию</div>
+          <div class="elements-panel-line-item-column">Цена</div>
+          <div class="elements-panel-line-item-column">Действия</div>
+        </div>
+
+        <div
+          v-for="(item, index) in folder.window_hardware_groups"
+          class="elements-panel-line-item"
+          :key="index"
+        >
+          <div class="elements-panel-line-item-column">{{ item.name }}</div>
+          <div class="elements-panel-line-item-column">
+            <svg
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 26 26"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              enable-background="new 0 0 26 26"
+              class="elements-panel-line-item-column-check"
+            >
+              <path
+                :style="{ fill: item.is_in_calculation ? '#0f0' : '#aaa' }"
+                d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"
+              ></path>
+            </svg>
+          </div>
+          <div class="elements-panel-line-item-column">
+            <svg
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 26 26"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              enable-background="new 0 0 26 26"
+              class="elements-panel-line-item-column-check"
+            >
+              <path
+                :style="{ fill: item.is_default ? '#0f0' : '#aaa' }"
+                d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"
+              ></path>
+            </svg>
+          </div>
+          <div class="elements-panel-line-item-column">{{ item.price }}</div>
+          <div class="elements-panel-line-item-column">
+            <button class="btn edit-profile" v-on:click="openItem(item)">
+              открыть
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="elements-panel-sub profile" v-if="edit_item_on">
+      <div class="elements-panel-sub-close" v-on:click="closeItem()">
+        &#215;
+      </div>
+      <div class="elements-panel-sub-title">
+        <span class="elements-panel-sub-title-txt">{{ opened_item.name }}</span>
+        <span class="elements-panel-sub-title-save">
+          <button
+            class="btn elements-panel-sub-submit"
+            v-on:click="saveOpenedItem()"
+          >
+            сохранить
+          </button>
+        </span>
+        <span class="elements-panel-sub-title-confirm">
+          <i class="elements-panel-sub-title-checked" v-if="data_saved">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              version="1.1"
+              viewBox="0 0 26 26"
+              enable-background="new 0 0 26 26"
+            >
+              <path
+                fill="#6ed44a"
+                d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"
+              ></path>
+            </svg>
+          </i>
+        </span>
+      </div>
+
+      <div class="elements-panel-sub-inner">
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Название</label>
+          <textarea
+            class="elements-panel-sub-input"
+            name
+            v-model="opened_item.name"
+          ></textarea>
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Краткое название</label>
+          <textarea
+            class="elements-panel-sub-input"
+            name
+            v-model="opened_item.short_name"
+          ></textarea>
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Группа</label>
+          <select
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.folder_id"
+          >
+            <option
+              v-for="(folder, ind) in hardwares"
+              :value="folder.id"
+              :key="ind"
+              >{{ folder.name }}</option
+            >
+          </select>
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Описание</label>
+          <textarea
+            class="elements-panel-sub-input"
+            name
+            v-model="opened_item.description"
+          ></textarea>
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Производитель</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.producer"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label"
+            >Активна (участвует в расчетах)</label
+          >
+          <input
+            class="elements-panel-sub-input"
+            type="checkbox"
+            name
+            v-model="opened_item.is_in_calculation"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Фурнитура по умолчанию</label>
+          <input
+            class="elements-panel-sub-input"
+            type="checkbox"
+            name
+            v-model="opened_item.is_default"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Ссылка</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.all_params.src_link"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Страна</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.country"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Изображение</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.img"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Мин. ширина</label>
+          <input
+            class="elements-panel-sub-input"
+            type="number"
+            name
+            v-model="opened_item.min_width"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Макс. ширина</label>
+          <input
+            class="elements-panel-sub-input"
+            type="number"
+            name
+            v-model="opened_item.max_width"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Мин. высота</label>
+          <input
+            class="elements-panel-sub-input"
+            type="number"
+            name
+            v-model="opened_item.min_height"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Макс. высота</label>
+          <input
+            class="elements-panel-sub-input"
+            type="number"
+            name
+            v-model="opened_item.max_height"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Приоритет предложения</label>
+          <input
+            class="elements-panel-sub-input"
+            type="number"
+            name
+            v-model="opened_item.position"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line" v-if="opened_item.id">
+          <button
+            class="elements-panel-btn clone"
+            v-on:click="cloneOpenedItem()"
+          >
+            создать копию
+          </button>
+          <button
+            class="elements-panel-btn remove"
+            v-on:click="removeOpenedItem()"
+          >
+            удалить
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="elements-panel-sub profile" v-if="edit_item_folder_on">
+      <div class="elements-panel-sub-close" v-on:click="closeItemFolder()">
+        &#215;
+      </div>
+      <div class="elements-panel-sub-title">
+        <span class="elements-panel-sub-title-txt">{{ opened_item.name }}</span>
+        <span class="elements-panel-sub-title-save">
+          <button
+            class="btn elements-panel-sub-submit"
+            v-on:click="saveOpenedItemFolder()"
+          >
+            сохранить
+          </button>
+        </span>
+        <span class="elements-panel-sub-title-confirm">
+          <i class="elements-panel-sub-title-checked" v-if="data_saved">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              version="1.1"
+              viewBox="0 0 26 26"
+              enable-background="new 0 0 26 26"
+            >
+              <path
+                fill="#6ed44a"
+                d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"
+              ></path>
+            </svg>
+          </i>
+        </span>
+      </div>
+
+      <div class="elements-panel-sub-inner">
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Название</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.name"
+          />
+        </div>
+
+        <!--
+          <div class="elements-panel-sub-line">
+            <label class="elements-panel-sub-label">Позиция отображения в калькуляторе </label>
+            <input class="elements-panel-sub-input" type="number" name="" v-model="opened_item.position">
+          </div>
+        -->
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Описание</label>
+          <textarea
+            class="elements-panel-sub-input"
+            name
+            v-model="opened_item.description"
+          ></textarea>
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Ссылка</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.all_params.link"
+          />
+        </div>
+
+        <div class="elements-panel-sub-line">
+          <label class="elements-panel-sub-label">Изображение</label>
+          <input
+            class="elements-panel-sub-input"
+            type="text"
+            name
+            v-model="opened_item.img"
+          />
+        </div>
+
+        <div
+          class="elements-panel-sub-line"
+          v-if="opened_item.id && folderIsEmpty(opened_item)"
+        >
+          <!--
+            <button class="elements-panel-btn clone" v-on:click="cloneOpenedFolder()">клонировать</button>
+          -->
+          <button
+            class="elements-panel-btn remove"
+            v-on:click="removeOpenedFolder()"
+          >
+            удалить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      showModal: false,
+      showReport: false,
+      checkBox: [],
+
+      profiles: this.$store.state.profiles,
+      hardwares: this.$store.state.hardwares,
+
+      edit_item_on: 0,
+      edit_item_folder_on: 0,
+      opened_item: {
+        all_params: {
+          src_link: "",
+          profile_width: 0,
+          class: "",
+          glass_width: "",
+          compose: "",
+          resist: 0
+        },
+        cameras: 0,
+        heat_coeff: 0,
+        heat_coeff_value: 0,
+        noise_coeff: 0,
+        link: "",
+        description: "",
+        name: "",
+        short_name: ""
+      },
+
+      data_saved: false
+    };
+  },
+  components: {},
+  props: {},
+
+  created() {
+    let that = this;
+
+    this.$store.watch(
+      function(state) {
+        return state.hardwares;
+      },
+      function(val) {
+        // console.log("state hardwares change +", val);
+        that.hardwares = val;
+        this.$forceUpdate();
+      },
+      {
+        deep: true
+      }
+    );
+
+    this.$store.watch(
+      function(state) {
+        return state.glass_folders;
+      },
+      function(val) {
+        that.glass_folders = val;
+      },
+      {
+        deep: true
+      }
+    );
+
+    this.$store.watch(
+      function(state) {
+        return state.glasses;
+      },
+      function(val) {
+        that.glasses = val;
+      },
+      {
+        deep: true
+      }
+    );
+
+    this.$store.dispatch("GET_ALL_HARDWARES");
+  },
+
+  computed: {},
+
+  mounted: function() {},
+
+  watch: {
+    hardwares: {
+      handler: function() {
+        // console.log("hardwares changed");
+      },
+      deep: true
+    }
+  },
+
+  methods: {
+    destroy() {
+      //this.$forceUpdate();
+    },
+    cleanOpenedItem() {
+      for (const key in this.opened_item) {
+        if (this.opened_item.hasOwnProperty(key)) {
+          if (typeof this.opened_item[key] === "string") {
+            this.opened_item[key] = "";
+          } else if (typeof this.opened_item[key] === "number") {
+            this.opened_item[key] = 0;
+          }
+          if (key === "all_params") {
+            for (const keyInner in this.opened_item[key]) {
+              if (this.opened_item[key].hasOwnProperty(keyInner)) {
+                if (typeof this.opened_item[key][keyInner] === "string") {
+                  this.opened_item[key][keyInner] = "";
+                } else if (
+                  typeof this.opened_item[key][keyInner] === "number"
+                ) {
+                  this.opened_item[key][keyInner] = 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    openItem: function(item) {
+      this.opened_item = JSON.parse(JSON.stringify(item));
+      let parsed_desc = {};
+      try {
+        parsed_desc = JSON.parse(this.opened_item.link);
+      } catch (e) {
+        console.log("parse link fail", this.opened_item.link);
+      }
+      parsed_desc =
+        parsed_desc && Object.keys(parsed_desc).length > 0
+          ? parsed_desc
+          : {
+              src_link: this.opened_item.link
+            };
+      this.opened_item.all_params = parsed_desc;
+      this.$forceUpdate();
+      this.edit_item_on = 1;
+    },
+
+    openItemFolder: function(folder) {
+      this.opened_item = JSON.parse(JSON.stringify(folder));
+      let parsed_desc = {};
+      try {
+        parsed_desc = JSON.parse(this.opened_item.link);
+      } catch (e) {
+        console.log("parse link fail", this.opened_item.link);
+      }
+      parsed_desc =
+        parsed_desc && Object.keys(parsed_desc).length > 0
+          ? parsed_desc
+          : {
+              src_link: this.opened_item.link
+            };
+      this.opened_item.all_params = parsed_desc;
+      this.$forceUpdate();
+      this.edit_item_on = 0;
+      this.edit_item_folder_on = 1;
+    },
+
+    closeItem: function() {
+      this.edit_item = {};
+      this.edit_item_on = 0;
+      this.cleanOpenedItem();
+      // this.opened_item = {};
+    },
+
+    closeItemFolder: function() {
+      this.edit_item = {};
+      this.edit_item_folder_on = 0;
+      this.cleanOpenedItem();
+    },
+
+    saveOpenedItem: function() {
+      let upd_profile = JSON.parse(JSON.stringify(this.opened_item));
+      upd_profile.link = JSON.stringify(upd_profile.all_params);
+      upd_profile.all_params = undefined;
+      upd_profile.hardware_group_id = upd_profile.id;
+      upd_profile.folder_id = parseInt(upd_profile.folder_id);
+      upd_profile.is_in_calculation = upd_profile.is_in_calculation ? 1 : 0;
+
+      if (!upd_profile.id || upd_profile.is_new) {
+        this.$store.dispatch("CREATE_HARDWARE", upd_profile);
+      } else this.$store.dispatch("UPDATE_HARDWARE", upd_profile);
+    },
+
+    cloneOpenedItem: function() {
+      let new_item = JSON.parse(JSON.stringify(this.opened_item));
+      new_item.name = new_item.name + " Копия";
+      this.$store.dispatch("CREATE_HARDWARE", new_item);
+    },
+
+    removeOpenedItem: function() {
+      if (!confirm("Подтвердите удаление фурнитуры!")) return;
+      if (!this.edit_item_on || !this.opened_item.id) return;
+      this.$store.dispatch("REMOVE_HARDWARE", {
+        hardware_id: this.opened_item.id
+      });
+    },
+
+    saveOpenedItemFolder: function() {
+      let upd_profile = JSON.parse(JSON.stringify(this.opened_item));
+      upd_profile.link = JSON.stringify(upd_profile.all_params);
+      upd_profile.all_params = undefined;
+      upd_profile.folder_id = upd_profile.id;
+
+      if (!upd_profile.folder_id || upd_profile.is_new) {
+        this.$store.dispatch("CREATE_HARDWARE_FOLDER", upd_profile);
+      } else this.$store.dispatch("UPDATE_HARDWARE_FOLDER", upd_profile);
+    },
+
+    goToInstruction: function() {
+      // load scheme of elements
+    },
+
+    createNewFolder: function() {
+      this.edit_item = {};
+      this.edit_item.is_new = 1;
+      this.edit_item.all_params = {};
+      this.edit_item_on = 0;
+      this.edit_item_folder_on = 1;
+    },
+
+    createNewItem: function() {
+      this.edit_item = {};
+      this.edit_item.is_new = 1;
+      this.edit_item.all_params = {};
+      this.edit_item_on = 1;
+      this.edit_item_folder_on = 0;
+    },
+
+    removeOpenedFolder: function() {
+      if (!confirm("Подтвердите удаление фурнитурной группы!")) return;
+      if (this.edit_item_folder_on) {
+        let folder = this.hardwares.filter(el => {
+          return el.id === this.opened_item.id;
+        })[0];
+        if (!folder) return;
+        if (
+          !folder.window_hardware_groups ||
+          !folder.window_hardware_groups.length
+        ) {
+          this.$store.dispatch("REMOVE_HARDWARE_FOLDER", {
+            hardwareFolderId: this.opened_item.id
+          });
+        }
+      }
+    },
+
+    folderIsEmpty: function(folder_item) {
+      if (!folder_item || !folder_item.id) return;
+      let folder = this.hardwares.filter(el => {
+        return el.id === folder_item.id;
+      })[0];
+      if (!folder) return;
+      if (folder.window_hardware_groups && folder.window_hardware_groups.length)
+        return false;
+      return true;
+    }
+  }
+};
+</script>
