@@ -1,0 +1,99 @@
+import Vue from "vue";
+
+//set single hardware
+export const UPDATE_HARDWARE = (state, data) => {
+  const folder = state.hardwares
+    .filter(hardware => hardware.id === data.folderId)[0]
+    .window_hardware_groups.map(hardware => {
+      if (hardware.id === data.result.id) {
+        return { ...data.result };
+      } else {
+        return hardware;
+      }
+    });
+  state.hardwares.map(hardware => {
+    if (hardware.id === data.folderId) {
+      return { ...folder };
+    } else {
+      return hardware;
+    }
+  });
+};
+
+//set hardware group
+export const SET_HARDWARE_FOLDER = (state, data) => {
+  state.hardwares = state.hardwares.map(hardware => {
+    if (hardware.id === data.result.id) {
+      return { ...data.result };
+    } else {
+      return hardware;
+    }
+  });
+};
+
+//set hardware group
+export const UPDATE_HARDWARE_GROUP = (state, data) => {
+  for (let gr_key in state.profiles.profileSystemFolders) {
+    let profile_to_update = state.profiles.profileSystemFolders[
+      gr_key
+    ].profile_systems.filter(el => {
+      return el.id === data.id;
+    })[0];
+    if (profile_to_update) {
+      for (let key in data) profile_to_update[key] = data[key];
+    }
+  }
+};
+
+//set all hardwares
+export const GETHARDWARES = (state, data) => {
+  Vue.set(state, "hardwares", data);
+};
+
+export const SET_HARDWARE = (state, data) => {
+  const newHardware = state.hardwares.filter(
+    hard => hard.id === data.result.folder_id
+  )[0].window_hardware_groups;
+  newHardware.push(data.result);
+  state.hardwares = state.hardwares.map(hard => {
+    return hard.id === newHardware.id ? { ...hard, newHardware } : hard;
+  });
+};
+
+export const REMOVE_HARDWARE = (state, data) => {
+  const result = state.hardwares
+    .filter(hardware => hardware.id === data.folderID)[0]
+    .window_hardware_groups.filter(
+      hardware => hardware.id !== data.hardware_id
+    );
+  state.hardwares = state.hardwares.map(hardware => {
+    if (hardware.id === data.folderID) {
+      return { ...hardware, window_hardware_groups: result };
+    } else {
+      return hardware;
+    }
+  });
+};
+
+export const REMOVE_HARDWARE_FOLDER = (state, data) => {
+  state.hardwares = state.hardwares.filter(
+    hardware => hardware.id !== data.hardwareFolderId
+  );
+};
+
+export const CREATE_HARDWARE = (state, data) => {
+  const folder = state.hardwares
+    .filter(hardware => hardware.id === data.folderId)[0]
+    .window_hardware_groups.push(data.result);
+  state.hardwares = state.hardwares.map(hardware => {
+    if (hardware.id === data.folderId) {
+      return { ...folder };
+    } else {
+      return hardware;
+    }
+  });
+};
+
+export const CREATE_HADRWARE_FOLDER = (state, data) => {
+  state.hardwares.push(data);
+};
